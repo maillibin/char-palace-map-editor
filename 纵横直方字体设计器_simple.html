@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<HTML>
+
+<HEAD>
+
+<META CHARSET="utf-8">
+
+<TITLE>字体设计器</TITLE>
+
+<STYLE>
+	body{
+		background-color:#999999;
+		margin:0px;
+		padding:0px;
+	}
+</STYLE>
+
+<SCRIPT>
+	var keyCodeValue=0;
+	var columnCount=32;
+	var rowCount=32;
+	
+	function init(){
+		
+		//创建背板
+		var board=document.createElement("div");
+		board.setAttribute("id","board");
+		board.style.cssText="position:relative;margin:20px;";	
+		
+		//创建信息栏显示当前坐标
+		var output=document.createElement("div");
+		output.setAttribute("id","output");
+		output.style.margin="10px";
+		output.innerHTML="字体设计器";
+		document.body.appendChild(output);	
+		
+		//字形数组输入栏
+		var dataInput=document.createElement("input");
+		dataInput.setAttribute("id","dataInput")
+		dataInput.style.cssText="width:300px;margin:10px;padding:10px;border-radius:10px;";
+		document.body.appendChild(dataInput);	
+		
+		//显示字形按钮
+		var OKbutton=document.createElement("button");
+		OKbutton.setAttribute("id","OKbutton");
+		OKbutton.innerHTML="数组 -> 字形";
+		OKbutton.style.cssText="margin:10px;padding:10px;border-radius:10px;";
+		OKbutton.onclick=function(){
+			var inputText=document.getElementById("dataInput").value;		
+			var inputArray=eval(inputText);
+			
+			//清空写字面板
+			for(var i=0;i<columnCount;i++){
+				for(var j=0;j<rowCount;j++){
+					var currentCell=document.getElementById("cell_"+i+"_"+j);
+					currentCell.style.backgroundColor="#AAAAAA";
+					currentCell.setAttribute("picked",0);
+				}
+			}
+			
+			//清空结果数组
+			document.getElementById("result").innerHTML=inputText;	
+			
+			//读取字形数组并显示到面板上
+			for(var i=0;i<inputArray.length;i++){
+				var pointPosition=inputArray[i];
+				var pickedCell=document.getElementById("cell_"+pointPosition[0]+"_"+pointPosition[1]);
+				pickedCell.style.backgroundColor="#666666";
+				pickedCell.setAttribute("picked",1);
+			}
+			
+		}
+		document.body.appendChild(OKbutton);
+		
+		//清除数据按钮
+		var clearButton=document.createElement("button");
+		clearButton.setAttribute("id","clearButton");
+		clearButton.innerHTML="清除数组";
+		clearButton.style.cssText="margin:10px;padding:10px;border-radius:10px;";
+		clearButton.onclick=function(){
+			document.getElementById("dataInput").value="";		   
+		}
+		document.body.appendChild(clearButton);
+		
+		
+		//用于显示字形数组
+		var result=document.createElement("div");
+		result.setAttribute("id","result");
+		result.style.cssText="width:640px;height:200px;margin:20px;overflow:auto;background-color:rgba(255,255,255,0.1);";
+		document.body.appendChild(result);			
+				
+		//显示单元格
+		for(var i=0;i<columnCount;i++){
+			for(var j=0;j<rowCount;j++){
+				var idName="cell"+"_"+i+"_"+j;
+				var newCell=document.createElement("div");
+				newCell.setAttribute("id",idName);
+				newCell.style.cssText="position:absolute;margin:0px;padding:0px;width:18px;height:18px;background-color:#AAAAAA;border-style:dotted;border-width:1px;border-color:#666666;";	
+				newCell.setAttribute("x",i);
+				newCell.setAttribute("y",j);
+				newCell.setAttribute("picked",0);
+				newCell.style.left=i*20+"px";
+				newCell.style.top=j*20+"px";
+				newCell.onmouseover=function(){
+					this.style.borderColor="#ff6666";
+					output.innerHTML="x: "+this.getAttribute("x")+" y: "+this.getAttribute("y");
+				}
+				newCell.onmouseout=function(){
+					this.style.borderColor="#666666";
+				}
+				newCell.onclick=function(){
+					var info="x: "+this.getAttribute("x")+" y: "+this.getAttribute("y");
+					output.innerHTML=info;
+					if(this.getAttribute("picked")==0){
+						this.setAttribute("picked",1);
+						this.style.backgroundColor="#666666";
+					}else{
+						this.setAttribute("picked",0);
+						this.style.backgroundColor="#AAAAAA";					
+					}
+					update();
+				}
+				//鼠标移动事件
+				newCell.onmousemove=function(){
+					console.log("mouseover:"+this.getAttribute("x")+":"+this.getAttribute("y")+"_______"+keyCodeValue);
+					//如果W键被按住则绘制
+					if(keyCodeValue==87){
+						var info="x: "+this.getAttribute("x")+" y: "+this.getAttribute("y");
+						output.innerHTML=info;
+						this.setAttribute("picked",1);
+						this.style.backgroundColor="#666666";
+						update();					
+					}
+					//如果E键被按住则擦除
+					if(keyCodeValue==69){
+						var info="x: "+this.getAttribute("x")+" y: "+this.getAttribute("y");
+						output.innerHTML=info;
+						this.setAttribute("picked",0);
+						this.style.backgroundColor="#AAAAAA";
+						update();					
+					}
+					
+				}
+				board.appendChild(newCell);
+				
+			}
+		}
+		
+		document.body.appendChild(board);
+		
+	}
+	
+	//每次点选单元格后更新字形数据
+	function update(){
+		var characterMatrix=new Array();
+		for(var i=0;i<columnCount;i++){
+			for(var j=0;j<rowCount;j++){
+				var point=document.getElementById("cell"+"_"+i+"_"+j);
+				if(point.getAttribute("picked")==1){
+					var position=new Array();
+					position[0]=point.getAttribute("x");
+					position[1]=point.getAttribute("y");		
+					characterMatrix.push(position);
+				}
+			}
+		}
+		
+		document.getElementById("result").innerHTML="[["+characterMatrix.join("],[")+"]]";
+		
+	}
+	
+	//窗口加载后初始化程序
+	window.onload=function(){
+	
+		document.addEventListener("keydown",keydown);
+		function keydown(event){
+			keyCodeValue=event.keyCode;
+		}
+		
+		document.addEventListener("keyup",keyup);
+		function keyup(event){
+			keyCodeValue=0;
+		}	
+		
+		init();		
+		
+	}
+	
+	
+
+</SCRIPT>
+
+</HEAD>
+
+<BODY>
+
+</BODY>
+
+</HTML>

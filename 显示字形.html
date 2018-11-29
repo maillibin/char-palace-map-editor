@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<HTML>
+
+<HEAD>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,target-densitydpi=high-dpi,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0, user-scalable=no"/>
+<TITLE>显示字形</TITLE>
+
+<STYLE TYPE="TEXT/CSS">
+body{
+	background:#ffffff;
+	margin:0px;
+	padding-top:200px;
+}
+
+</STYLE>
+
+<SCRIPT TYPE="TEXT/JAVASCRIPT" SRC="thousandCharacterForm.js">
+
+<SCRIPT TYPE="TEXT/JAVASCRIPT">
+
+</SCRIPT>
+
+</HEAD>
+
+<BODY>
+
+<SCRIPT TYPE="TEXT/JAVASCRIPT">
+
+var characterSizeMax=0;
+var maxSizedCharacter="";
+
+
+for(var character in thousandCharacterForm){ 
+
+	var cell=document.createElement("div");
+	cell.style.cssText="position:relative;background-color:#ee6666;display:inline-block;margin:5px;box-shadow:0px 0px 20px #999999;border-radius:10px;";
+	
+	var formArray=thousandCharacterForm[character];
+	
+	var cellWidth=0;
+	var cellHeight=0;
+	
+	for(var i=0;i<formArray.length;i++){
+		var x=formArray[i][0];
+		var y=formArray[i][1];
+		
+		//统计最大字符尺寸		
+		if(x>=characterSizeMax){
+			characterSizeMax=x;
+			maxSizedCharacter=character+" [字符宽度] ";
+		}
+		if(y>=characterSizeMax){
+			characterSizeMax=y;
+			maxSizedCharacter=character+" [字符高度] ";
+		}
+		
+		
+		var cellWidthTo=x*10;
+		var cellHeightTo=y*10;
+		
+		if(cellWidthTo>cellWidth){
+			cellWidth=cellWidthTo;
+			cell.style.width=cellWidth+30+"px";
+		}
+		
+		if(cellHeightTo>cellHeight){
+			cellHeight=cellHeightTo;
+			cell.style.height=cellHeight+30+"px";
+		}
+		
+		var point=document.createElement("div");
+		point.style.cssText="position:absolute;background-color:#ffffff;width:10px;height:10px;margin:0px;padding:0px;"
+		point.style.left=x*10+10+"px";
+		point.style.top=y*10+10+"px";
+		cell.appendChild(point);
+	}
+	
+	document.body.appendChild(cell);	
+	
+}
+
+//显示字符统计信息
+var statistics=document.createElement("div");
+statistics.setAttribute("id","statistics");
+statistics.style.cssText="position:fixed;top:0px;padding:30px;margin:10px;background-color:#999999;box-shadow:0px 0px 30px #999999;color:#ffffff;border-radius:10px;";
+statistics.innerHTML="<h3>字形数据</h3><hr>"+"最大尺寸字符："+maxSizedCharacter+"（"+characterSizeMax+"点）";
+document.body.appendChild(statistics);
+
+
+</SCRIPT>
+	
+</BODY>
+
+
+
+</HTML>
